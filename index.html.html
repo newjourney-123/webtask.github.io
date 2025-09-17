@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Registration Form (Preferences)</title>
+  <style>
+    :root{font-family: system-ui,Segoe UI,Roboto,Helvetica,Arial;--card-bg:#fff;--bg:#f2f4f7;--accent:#0b74de}
+    body{margin:0;background:var(--bg);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+    .card{background:var(--card-bg);max-width:720px;width:100%;border-radius:12px;box-shadow:0 6px 20px rgba(11,19,30,0.08);padding:24px}
+    h1{margin:0 0 8px;font-size:20px}
+    p.lead{margin:0 0 18px;color:#444}
+    form{display:grid;gap:12px}
+    label{display:block;font-size:13px;margin-bottom:6px}
+    input[type="text"],input[type="email"],input[type="number"],select,textarea{width:100%;padding:10px;border:1px solid #d5dbe6;border-radius:8px;font-size:14px}
+    textarea{min-height:100px}
+    .row{display:flex;gap:12px}
+    .row > *{flex:1}
+    .small{font-size:13px;color:#666}
+    .actions{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:6px}
+    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:0;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid #c9ddfb}
+    .muted{color:#666;font-size:13px}
+    .consent{display:flex;gap:8px;align-items:center}
+    .optional{font-style:italic;color:#888;font-size:12px;margin-left:6px}
+    fieldset{border:1px solid #eef2f7;padding:12px;border-radius:8px}
+    legend{padding:0 6px;font-weight:600}
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>Registration (optional preference fields)</h1>
+    <p class="lead">This form lets users optionally share sexual/desire preferences. Fields asking about sexual preference are optional and protected — please ensure you have a privacy policy before collecting data.</p>
+
+    <form id="regForm" novalidate>
+      <fieldset>
+        <legend>Account (optional)</legend>
+        <label for="username">Username <span class="optional">(optional — avoid if collecting sensitive info)</span></label>
+        <input id="username" name="username" type="text" placeholder="Choose a display name">
+
+        <label for="email">Email <span class="optional">(optional)</span></label>
+        <input id="email" name="email" type="email" placeholder="you@example.com">
+      </fieldset>
+
+      <fieldset>
+        <legend>Age & Consent</legend>
+        <div class="row">
+          <div>
+            <label for="age">Age</label>
+            <input id="age" name="age" type="number" min="18" placeholder="18" required>
+            <p class="small">You must be 18 or older to submit sensitive preference information.</p>
+          </div>
+          <div>
+            <label for="country">Country <span class="optional">(optional)</span></label>
+            <input id="country" name="country" type="text" placeholder="Country">
+          </div>
+        </div>
+
+        <label class="consent"><input id="confirmAge" name="confirmAge" type="checkbox" required> <span>I confirm I am 18+ and consent to provide this information.</span></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Preferences (optional)</legend>
+
+        <label for="orientation">Sexual orientation / Desire</label>
+        <select id="orientation" name="orientation" aria-describedby="orientationHelp">
+          <option value="">-- Prefer not to say / Choose --</option>
+          <option value="heterosexual">Heterosexual</option>
+          <option value="homosexual">Homosexual / Gay/Lesbian</option>
+          <option value="bisexual">Bisexual</option>
+          <option value="asexual">Asexual</option>
+          <option value="pansexual">Pansexual</option>
+          <option value="questioning">Questioning</option>
+          <option value="other">Other (write below)</option>
+        </select>
+        <p id="orientationHelp" class="small">Selecting an option is optional; users may prefer not to disclose.</p>
+
+        <label for="details">More details (optional)</label>
+        <textarea id="details" name="details" placeholder="Any additional preferences, boundaries or notes (optional)"></textarea>
+
+        <label for="interests">Specific interests / boundaries <span class="optional">(optional)</span></label>
+        <input id="interests" name="interests" type="text" placeholder="Short, comma-separated (e.g. romantic, physical, etc.)">
+
+      </fieldset>
+
+      <label class="consent"><input id="agreePrivacy" name="agreePrivacy" type="checkbox" required> I have read the <a href="#" id="privacyLink">privacy notice</a> and agree to how my data will be stored/used.</label>
+
+      <div class="actions">
+        <div class="muted">Fields marked required must be completed to submit.</div>
+        <div>
+          <button type="button" class="btn ghost" id="resetBtn">Reset</button>
+          <button type="submit" class="btn">Submit</button>
+        </div>
+      </div>
+
+    </form>
+
+    <p class="small" style="margin-top:12px">Important: Do not collect sensitive sexual information from minors. Keep sensitive data minimal, optional, and store it securely (encryption at rest, access control). Consult local law and your privacy policy.</p>
+  </main>
+
+  <script>
+    // Simple client-side validation & UX helpers. Server must also validate.
+    const form = document.getElementById('regForm');
+    const resetBtn = document.getElementById('resetBtn');
+    const privacyLink = document.getElementById('privacyLink');
+
+    privacyLink.addEventListener('click', (e)=>{
+      e.preventDefault();
+      alert('Make sure you provide a clear privacy policy explaining how sensitive data is stored, who can access it, and how to request deletion.');
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      form.reset();
+    });
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const age = Number(document.getElementById('age').value);
+      const confirmAge = document.getElementById('confirmAge').checked;
+      const agreePrivacy = document.getElementById('agreePrivacy').checked;
+
+      // Basic checks
+      if (!confirmAge || !agreePrivacy) {
+        alert('Please confirm age and agree to the privacy notice.');
+        return;
+      }
+      if (isNaN(age) || age < 18) {
+        alert('Submission blocked: you must be 18 or older to submit sensitive preference information.');
+        return;
+      }
+
+      // Build payload (keep PII minimal)
+      const payload = {
+        username: document.getElementById('username').value || null,
+        email: document.getElementById('email').value || null,
+        age: age,
+        orientation: document.getElementById('orientation').value || null,
+        details: document.getElementById('details').value || null,
+        interests: document.getElementById('interests').value || null,
+        submittedAt: new Date().toISOString()
+      };
+
+      // NOTE: This demo uses fetch to a placeholder URL. Replace with your secure server endpoint.
+      // On the server: validate again, require minimal PII, store encrypted, keep access logs limited.
+      console.log('Prepared payload (do not log sensitive info in production):', payload);
+      alert('Form validated locally. In a real app this would be sent securely to your server.');
+
+      // Example: send via fetch (commented out for demo)
+      // fetch('/api/register-preferences', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      //   .then(r=>r.json()).then(r=>alert('Saved')).catch(err=>alert('Error'));
+
+      form.reset();
+    });
+  </script>
+</body>
+</html>
